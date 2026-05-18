@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="SOLEA favicon">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f3e7da"/>
+      <stop offset="100%" stop-color="#e8cfbf"/>
+    </linearGradient>
+  </defs>
+  <rect x="2" y="2" width="60" height="60" rx="14" fill="url(#bg)" />
+  <rect x="2" y="2" width="60" height="60" rx="14" fill="none" stroke="#967053" stroke-width="2"/>
+  <text x="32" y="43" text-anchor="middle" font-size="34" font-family="Georgia, 'Times New Roman', serif" fill="#3a302b">S</text>
+</svg>
