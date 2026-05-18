@@ -47,7 +47,7 @@ function initMobileNav() {
   });
 }
 
-const booking = { service: null, duration: null, price: null, date: null, time: null, name: '', phone: '', notes: '' };
+const booking = { service: null, duration: null, price: null, date: null, time: null, name: '', notes: '' };
 
 function goToStep(n) {
   if (n === 2 && !booking.service) { alert('אנא בחרי טיפול'); return; }
@@ -398,14 +398,11 @@ function formatDate(d) {
 
 function submitBooking() {
   const name = document.getElementById('clientName').value.trim();
-  const phone = document.getElementById('clientPhone').value.trim();
   const notes = document.getElementById('clientNotes').value.trim();
 
   if (!name) { alert('אנא הזיני שם'); return; }
-  if (!phone) { alert('אנא הזיני טלפון'); return; }
 
   booking.name = name;
-  booking.phone = phone;
   booking.notes = notes;
 
   const appointment = {
@@ -417,7 +414,6 @@ function submitBooking() {
     dateISO: booking.date.toISOString().split('T')[0],
     time: booking.time,
     name: booking.name,
-    phone: booking.phone,
     notes: booking.notes,
     status: 'pending',
     createdAt: new Date().toISOString()
@@ -429,7 +425,6 @@ function submitBooking() {
 
   const msg = `*🌿 בקשת תור חדשה SOLÉA*%0A%0A` +
     `*שם:* ${name}%0A` +
-    `*טלפון:* ${phone}%0A` +
     `*טיפול:* ${booking.service}%0A` +
     `*תאריך:* ${formatDate(booking.date)}%0A` +
     `*שעה:* ${booking.time}%0A` +
@@ -451,10 +446,8 @@ function resetBooking() {
   booking.date = null;
   booking.time = null;
   booking.name = '';
-  booking.phone = '';
   booking.notes = '';
   document.getElementById('clientName').value = '';
-  document.getElementById('clientPhone').value = '';
   document.getElementById('clientNotes').value = '';
   document.querySelectorAll('.service-option.selected').forEach(o => o.classList.remove('selected'));
   document.getElementById('timeSlotsContainer').style.display = 'none';
@@ -512,7 +505,7 @@ function renderAppointments() {
         <div class="appointment-info">
           <h4>${a.name} · ${a.service}</h4>
           <div class="meta"><strong>${a.date}</strong> בשעה <strong>${a.time}</strong></div>
-          <div class="meta">📞 ${a.phone}${a.notes ? ' · 📝 ' + a.notes : ''}</div>
+          ${a.notes ? `<div class="meta">📝 ${a.notes}</div>` : ''}
           <span class="status-badge ${statusClass}">${statusText}</span>
         </div>
         <div class="appointment-actions">
@@ -521,10 +514,12 @@ function renderAppointments() {
             <button class="btn-mini btn-reject" onclick="updateStatus(${a.id}, 'rejected', 'דחיה')">✗ דחה</button>
             <button class="btn-mini btn-reschedule" onclick="rescheduleAppointment(${a.id})">📅 מועד אחר</button>
           ` : ''}
+          ${a.phone ? `
           <a href="https://wa.me/${formatPhoneForWA(a.phone)}" target="_blank" class="btn-mini btn-wa">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51z"/></svg>
             WhatsApp
           </a>
+          ` : ''}
           <button class="btn-mini btn-reject" onclick="deleteAppointment(${a.id})" style="margin-right: auto;">🗑</button>
         </div>
       </div>
@@ -552,6 +547,10 @@ function updateStatus(id, status, action) {
     msg = `*🌿 SOLÉA Facial Studio*%0A%0Aשלום ${apt.name},%0Aלצערי לא אוכל לקבל אותך במועד שביקשת:%0A${apt.date} בשעה ${apt.time}%0A%0Aנשמח להציע מועד חלופי. צרי איתי קשר 💛`;
   }
   
+  if (!apt.phone) {
+    renderAppointments();
+    return;
+  }
   if (confirm(`האם לפתוח את WhatsApp לשליחת הודעת ${action} ל${apt.name}?`)) {
     window.open(`https://wa.me/${formatPhoneForWA(apt.phone)}?text=${msg}`, '_blank');
   }
@@ -575,6 +574,10 @@ function rescheduleAppointment(id) {
 
   const msg = `*🌿 SOLÉA Facial Studio*%0A%0Aשלום ${apt.name},%0Aלצערי המועד שביקשת (${apt.date} בשעה ${apt.time}) לא זמין.%0A%0Aאשמח להציע לך מועד חלופי:%0A*${newDate}*%0A*בשעה ${newTime}*%0A%0Aמתאים לך? ✨`;
 
+  if (!apt.phone) {
+    renderAppointments();
+    return;
+  }
   if (confirm(`האם לפתוח את WhatsApp לשליחת הצעה חלופית ל${apt.name}?`)) {
     window.open(`https://wa.me/${formatPhoneForWA(apt.phone)}?text=${msg}`, '_blank');
   }
